@@ -1,0 +1,169 @@
+# Terraform infrastructure deployment workflow
+# Manages AWS resources (VPC, EKS, SQS, S3, DynamoDB)
+# Dev: Auto-deploys on push to main
+# Production: Requires manual trigger and approval
+name: Deploy Terraform Infrastructure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infrastructure/terraform/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infrastructure/terraform/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - production
+      action:
+        description: 'Terraform action'
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+env:
+  AWS_REGION: eu-central-1
+  TF_VERSION: 1.5.0
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: terraform init
+      
+      - name: Terraform Format Check
+        working-directory: infrastructure/terraform
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+      
+      - name: Terraform Validate
+        working-directory: infrastructure/terraform
+        run: terraform validate
+      
+      - name: Terraform Plan - Dev
+        if: github.event_name == 'pull_request' || github.event.inputs.environment == 'dev'
+        working-directory: infrastructure/terraform
+        run: |
+          terraform workspace select dev || terraform workspace new dev
+          terraform plan -var-file=environments/dev.tfvars -out=dev.tfplan
+      
+      - name: Upload Dev Plan
+        if: github.event_name == 'pull_request' || github.event.inputs.environment == 'dev'
+        uses: actions/upload-artifact@v3
+        with:
+          name: dev-tfplan
+          path: infrastructure/terraform/dev.tfplan
+  
+  terraform-apply-dev:
+    name: Apply to Dev
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    if: |
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev' && github.event.inputs.action == 'apply')
+    environment:
+      name: dev-infrastructure
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: terraform init
+      
+      - name: Terraform Apply - Dev
+        working-directory: infrastructure/terraform
+        run: |
+          terraform workspace select dev || terraform workspace new dev
+          terraform apply -var-file=environments/dev.tfvars -auto-approve
+      
+      - name: Save Outputs
+        working-directory: infrastructure/terraform
+        run: terraform output -json > outputs.json
+      
+      - name: Upload Outputs
+        uses: actions/upload-artifact@v3
+        with:
+          name: dev-outputs
+          path: infrastructure/terraform/outputs.json
+  
+  terraform-apply-production:
+    name: Apply to Production
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.action == 'apply'
+    environment:
+      name: production-infrastructure
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Terraform Init
+        working-directory: infrastructure/terraform
+        run: terraform init
+      
+      - name: Terraform Apply - Production
+        working-directory: infrastructure/terraform
+        run: |
+          terraform workspace select production || terraform workspace new production
+          terraform apply -var-file=environments/production.tfvars -auto-approve
+      
+      - name: Save Outputs
+        working-directory: infrastructure/terraform
+        run: terraform output -json > outputs.json
+      
+      - name: Upload Outputs
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-outputs
+          path: infrastructure/terraform/outputs.json

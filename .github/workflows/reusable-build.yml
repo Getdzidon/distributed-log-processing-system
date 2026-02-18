@@ -1,0 +1,124 @@
+# Reusable workflow for testing, security scanning, and building Docker images
+# Called by dev.yml and production.yml to avoid code duplication
+name: Reusable Test & Build
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    outputs:
+      image-tag:
+        value: ${{ jobs.build.outputs.image-tag }}
+
+env:
+  AWS_REGION: eu-central-1
+  ECR_REPOSITORY: log-processor
+
+permissions:
+  id-token: write           # Required for OIDC authentication with AWS
+  contents: read            # Required to checkout code
+  security-events: write    # Required to upload security scan results
+
+jobs:
+  # Run unit tests, linting, and code coverage
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      # Cache pip dependencies to speed up workflow
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          
+      - name: Install dependencies
+        run: pip install -r requirements.txt pylint black
+          
+      # Lint code for quality issues (non-blocking)
+      - name: Lint
+        run: pylint src/ --disable=C0111,R0903
+        continue-on-error: true
+        
+      # Check code formatting (non-blocking)
+      - name: Format check
+        run: black --check src/
+        continue-on-error: true
+        
+      # Run unit tests with coverage report
+      - name: Test
+        run: pytest tests/ -v --cov=src --cov-report=xml
+        
+      # Upload coverage to Codecov for tracking
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          
+  # Scan code for security vulnerabilities
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      # Scan filesystem for vulnerabilities using Trivy
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      # Upload results to GitHub Security tab
+      - name: Upload results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+          
+  # Build Docker image and push to ECR
+  build:
+    needs: [test, security-scan]  # Only build if tests and security scan pass
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v6
+      
+      # Authenticate with AWS using OIDC (no long-lived credentials)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      # Login to Amazon ECR
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        
+      # Generate Docker image tags (environment-commit_sha)
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          tags: type=sha,prefix=${{ inputs.environment }}-
+            
+      # Build and push Docker image with layer caching
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha  # Use GitHub Actions cache
+          cache-to: type=gha,mode=max

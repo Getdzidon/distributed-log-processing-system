@@ -1,0 +1,70 @@
+# Pull request validation workflow
+# Runs tests and security scans on PRs without deploying
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+  security-events: write  # Required to upload security scan results
+  pull-requests: write    # Required to comment on PRs
+
+jobs:
+  test:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          
+      - name: Cache dependencies
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pylint black
+          
+      - name: Lint with pylint
+        run: pylint src/ --disable=C0111,R0903
+        continue-on-error: true
+        
+      - name: Format check with black
+        run: black --check src/
+        continue-on-error: true
+        
+      - name: Run tests
+        run: pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
+        
+      - name: Upload coverage
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'

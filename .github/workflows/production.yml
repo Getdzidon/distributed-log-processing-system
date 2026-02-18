@@ -1,0 +1,54 @@
+# Production deployment workflow with multi-region support
+# Triggers on push to main branch and requires manual approval before deploying
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write   # Required for OIDC authentication
+  contents: read
+
+jobs:
+  # Call reusable workflow for test, scan, and build
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      environment: production
+    secrets: inherit  # Pass all secrets to reusable workflow
+    
+  # Deploy to production EKS clusters in multiple regions
+  deploy:
+    needs: build  # Only deploy if build succeeds
+    runs-on: ubuntu-latest
+    environment:
+      name: production  # Requires manual approval (configured in GitHub)
+      url: https://logs.cmg.example.com
+    steps:
+      - uses: actions/checkout@v6
+      
+      # Authenticate with AWS using OIDC
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          
+      # Deploy to primary region (eu-central-1)
+      - name: Deploy eu-central-1
+        run: |
+          aws eks update-kubeconfig --name cmg-log-processor-prod-eu-central-1 --region eu-central-1
+          helm upgrade --install log-processor infrastructure/helm/log-processor \
+            --namespace log-processing --create-namespace \
+            --values infrastructure/helm/log-processor/values-production.yaml \
+            --set image.tag=${{ needs.build.outputs.image-tag }} --wait
+            
+      # Deploy to secondary region (eu-west-1) for high availability
+      - name: Deploy eu-west-1
+        run: |
+          aws eks update-kubeconfig --name cmg-log-processor-prod-eu-west-1 --region eu-west-1
+          helm upgrade --install log-processor infrastructure/helm/log-processor \
+            --namespace log-processing --create-namespace \
+            --values infrastructure/helm/log-processor/values-production.yaml \
+            --set image.tag=${{ needs.build.outputs.image-tag }} --wait

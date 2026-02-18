@@ -1,0 +1,45 @@
+# Dev environment deployment workflow
+# Triggers on push to dev branch and automatically deploys to dev EKS cluster
+name: Deploy to Dev
+
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  id-token: write   # Required for OIDC authentication
+  contents: read
+
+jobs:
+  # Call reusable workflow for test, scan, and build
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      environment: dev
+    secrets: inherit  # Pass all secrets to reusable workflow
+    
+  # Deploy to dev EKS cluster
+  deploy:
+    needs: build  # Only deploy if build succeeds
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: https://dev.cmg-logs.example.com
+    steps:
+      - uses: actions/checkout@v6
+      
+      # Authenticate with AWS using OIDC
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-central-1
+          
+      # Deploy to dev EKS cluster using Helm
+      - name: Deploy
+        run: |
+          aws eks update-kubeconfig --name cmg-log-processor-dev --region eu-central-1
+          helm upgrade --install log-processor infrastructure/helm/log-processor \
+            --namespace log-processing --create-namespace \
+            --values infrastructure/helm/log-processor/values-dev.yaml \
+            --set image.tag=${{ needs.build.outputs.image-tag }} --wait

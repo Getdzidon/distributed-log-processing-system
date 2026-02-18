@@ -1,6 +1,6 @@
 # Dockerfile for log processor application
 # Multi-stage build for minimal image size
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 

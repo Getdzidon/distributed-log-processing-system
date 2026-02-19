@@ -41,8 +41,15 @@ infrastructure/
 └── helm/             # Kubernetes manifests
 
 .github/workflows/    # CI/CD pipelines
+
 tests/               # Unit tests
+
 docs/                # Documentation
+
+scripts/
+├── setup.sh               # Complete automated deployment script (read notes on script for more details)
+├── send_test_messages.sh  # Send sample sensor data to SQS
+└── load_test.sh           # Performance testing script
 ```
 
 ## 📊 Observability
@@ -65,6 +72,7 @@ See [docs/ADDING_SENSORS.md](docs/ADDING_SENSORS.md)
 
 **Workflows:**
 - `pr-checks.yml` - Test PRs
+- `reusable-build.yml` - Shared build workflow for dev and Prod
 - `dev.yml` - Deploy to dev (auto)
 - `production.yml` - Deploy to production (manual approval)
 - `terraform.yml` - Infrastructure deployment
@@ -75,7 +83,7 @@ See [docs/CICD.md](docs/CICD.md)
 
 - Primary: eu-central-1
 - Secondary: eu-west-1
-- RPO: < 1 min, RTO: < 5 min
+- RPO: <1 min, RTO: <5 min (Recovery Point Objective - max data loss <1 min, Recovery Time Objective - recovery time <5 min)
 
 ## 📚 Documentation
 

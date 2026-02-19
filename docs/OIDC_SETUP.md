@@ -2,7 +2,7 @@
 
 ## Overview
 
-Both workflows now use **OIDC (OpenID Connect)** instead of long-lived AWS credentials for enhanced security.
+GitHub Actions workflows use **OIDC (OpenID Connect)** instead of long-lived AWS credentials for enhanced security.
 
 ## Benefits
 
@@ -11,7 +11,39 @@ Both workflows now use **OIDC (OpenID Connect)** instead of long-lived AWS crede
 - ✅ Fine-grained permissions per workflow
 - ✅ Audit trail in AWS CloudTrail
 
-## Setup Instructions
+## Setup Methods
+
+### Method 1: Using Terraform Module (Recommended)
+
+The repository includes a Terraform module for automated OIDC setup.
+
+```hcl
+# Add to infrastructure/terraform/main.tf
+module "github_oidc" {
+  source = "./modules/github-oidc"
+  
+  project_name  = "cmg-log-processor"
+  environment   = "production"
+  github_org    = "your-github-username"  # Your GitHub username (personal account)
+  github_repo   = "cmg-sre-test"          # Your repository name
+  
+  attach_admin_policy = true  # Use with caution, only for initial setup
+}
+
+output "github_actions_role_arn" {
+  value = module.github_oidc.role_arn
+}
+```
+
+Deploy:
+```bash
+cd infrastructure/terraform
+terraform apply
+```
+
+The module will output the role ARN to use in GitHub secrets.
+
+### Method 2: Manual Setup
 
 ### Step 1: Create OIDC Provider in AWS
 

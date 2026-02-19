@@ -28,15 +28,21 @@ autoscaling:
 env:
   - name: ENVIRONMENT
     value: "dev"
+
   - name: SERVICE_NAME
     value: "log-processor"
+
   - name: AWS_REGION
     value: "eu-central-1"
+
   - name: OTLP_ENDPOINT
     value: "opentelemetry-collector.observability.svc.cluster.local:4317"
+
   - name: QUEUE_URL
     value: "https://sqs.eu-central-1.amazonaws.com/123456789012/cmg-log-processor-dev-queue"
+
   - name: RAW_LOGS_BUCKET
     value: "cmg-log-processor-dev-raw-logs"
+    
   - name: PROCESSED_METRICS_TABLE
     value: "cmg-log-processor-dev-metrics"

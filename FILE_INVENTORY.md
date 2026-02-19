@@ -9,6 +9,7 @@
 - [x] docs/DEPLOYMENT.md - Deployment guide
 - [x] docs/CICD.md - CI/CD workflows
 - [x] docs/OIDC_SETUP.md - OIDC authentication
+- [x] docs/GITHUB_SECRETS.md - Secrets management
 - [x] docs/ADDING_SENSORS.md - Extensibility guide
 - [x] docs/TROUBLESHOOTING.md - Problem resolution
 
@@ -23,23 +24,42 @@
 - [x] src/processors/humidity.py - Humidity sensor
 - [x] src/processors/pressure.py - Pressure sensor
 
-### 🏗️ Infrastructure as Code (15+ files)
+### 🏗️ Infrastructure as Code (42+ files)
+- [x] infrastructure/bootstrap/main.tf - Bootstrap S3 backend and GitHub OIDC
+- [x] infrastructure/bootstrap/variables.tf
+- [x] infrastructure/bootstrap/trust-policy.json
+- [x] infrastructure/bootstrap/deploy-policy.json
+- [x] infrastructure/bootstrap/README.md
 - [x] infrastructure/terraform/main.tf - Main configuration
 - [x] infrastructure/terraform/variables.tf - Variable definitions
+- [x] infrastructure/terraform/outputs.tf - Output values
+- [x] infrastructure/terraform/README.md - Two-environment setup guide
 - [x] infrastructure/terraform/environments/dev.tfvars
 - [x] infrastructure/terraform/environments/production.tfvars
-- [x] infrastructure/terraform/modules/vpc/main.tf
+- [x] infrastructure/terraform/modules/vpc/vpc.tf
 - [x] infrastructure/terraform/modules/vpc/variables.tf
-- [x] infrastructure/terraform/modules/eks/main.tf
+- [x] infrastructure/terraform/modules/vpc/outputs.tf
+- [x] infrastructure/terraform/modules/eks/eks.tf
 - [x] infrastructure/terraform/modules/eks/variables.tf
-- [x] infrastructure/terraform/modules/sqs/main.tf
+- [x] infrastructure/terraform/modules/eks/outputs.tf
+- [x] infrastructure/terraform/modules/sqs/sqs.tf
 - [x] infrastructure/terraform/modules/sqs/variables.tf
-- [x] infrastructure/terraform/modules/s3/main.tf
+- [x] infrastructure/terraform/modules/sqs/outputs.tf
+- [x] infrastructure/terraform/modules/s3/s3.tf
 - [x] infrastructure/terraform/modules/s3/variables.tf
-- [x] infrastructure/terraform/modules/dynamodb/main.tf
+- [x] infrastructure/terraform/modules/s3/outputs.tf
+- [x] infrastructure/terraform/modules/dynamodb/dynamodb.tf
 - [x] infrastructure/terraform/modules/dynamodb/variables.tf
-- [x] infrastructure/terraform/modules/irsa/main.tf
+- [x] infrastructure/terraform/modules/dynamodb/outputs.tf
+- [x] infrastructure/terraform/modules/irsa/irsa.tf
 - [x] infrastructure/terraform/modules/irsa/variables.tf
+- [x] infrastructure/terraform/modules/irsa/outputs.tf
+- [x] infrastructure/terraform/modules/secondary-region/main.tf
+- [x] infrastructure/terraform/modules/secondary-region/variables.tf
+- [x] infrastructure/terraform/modules/secondary-region/README.md
+- [x] infrastructure/terraform/modules/route53/main.tf
+- [x] infrastructure/terraform/modules/route53/variables.tf
+- [x] infrastructure/terraform/modules/route53/README.md
 
 ### ☸️ Kubernetes/Helm (6 files)
 - [x] infrastructure/helm/log-processor/Chart.yaml
@@ -64,7 +84,8 @@
 - [x] .github/workflows/terraform.yml - Infrastructure deployment
 - [x] .github/dependabot.yml - Dependency updates
 
-### 🛠️ Scripts (2 files)
+### 🛠️ Scripts (3 files)
+- [x] scripts/setup.sh - Complete automated deployment
 - [x] scripts/send_test_messages.sh - Test message sender
 - [x] scripts/load_test.sh - Load testing
 
@@ -79,9 +100,9 @@
 
 ## 📊 Statistics
 
-- **Total Files**: 50+
-- **Lines of Code**: ~3,500+
-- **Documentation Pages**: 8
+- **Total Files**: 75+
+- **Lines of Code**: ~4,000+
+- **Documentation Pages**: 9
 - **Terraform Modules**: 7
 - **GitHub Workflows**: 5
 - **Test Coverage**: 85%+
@@ -95,12 +116,12 @@
 | Category | Status | Files | Quality |
 |----------|--------|-------|---------|
 | Application Code | ✅ Complete | 8 | Production-ready |
-| Infrastructure | ✅ Complete | 14 | Modular, reusable |
+| Infrastructure | ✅ Complete | 35 | Modular, reusable |
 | Kubernetes | ✅ Complete | 6 | GitOps-ready |
 | CI/CD | ✅ Complete | 6 | Automated |
 | Tests | ✅ Complete | 4 | 85%+ coverage |
-| Documentation | ✅ Complete | 8 | Comprehensive |
-| Scripts | ✅ Complete | 2 | Automated |
+| Documentation | ✅ Complete | 9 | Comprehensive |
+| Scripts | ✅ Complete | 3 | Automated |
 
 ---
 

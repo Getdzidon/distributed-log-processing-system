@@ -103,7 +103,7 @@ class LogProcessorService:
                         self.process_message(message)
                 else:
                     logger.debug("No messages received")
-                    
+                                       
             except KeyboardInterrupt:
                 logger.info("Shutting down gracefully...")
                 sys.exit(0)

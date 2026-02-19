@@ -1,0 +1,242 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "EKSAccess",
+      "Effect": "Allow",
+      "Action": [
+        "eks:DescribeCluster",
+        "eks:ListClusters",
+        "eks:UpdateClusterConfig"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ECRAccess",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:PutImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "TerraformStateAccess",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::cmg-terraform-state",
+        "arn:aws:s3:::cmg-terraform-state/*"
+      ]
+    },
+    {
+      "Sid": "TerraformStateLocking",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/terraform-lock"
+    },
+    {
+      "Sid": "STSAccess",
+      "Effect": "Allow",
+      "Action": [
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    }
+
+    // Uncomment below for full Terraform infrastructure creation permissions
+    // This replaces the need for AdministratorAccess (attach_admin_policy = false)
+    
+    // {
+    //   "Sid": "VPCManagement",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "ec2:CreateVpc",
+    //     "ec2:DeleteVpc",
+    //     "ec2:DescribeVpcs",
+    //     "ec2:ModifyVpcAttribute",
+    //     "ec2:CreateSubnet",
+    //     "ec2:DeleteSubnet",
+    //     "ec2:DescribeSubnets",
+    //     "ec2:CreateInternetGateway",
+    //     "ec2:DeleteInternetGateway",
+    //     "ec2:AttachInternetGateway",
+    //     "ec2:DetachInternetGateway",
+    //     "ec2:DescribeInternetGateways",
+    //     "ec2:CreateNatGateway",
+    //     "ec2:DeleteNatGateway",
+    //     "ec2:DescribeNatGateways",
+    //     "ec2:AllocateAddress",
+    //     "ec2:ReleaseAddress",
+    //     "ec2:DescribeAddresses",
+    //     "ec2:CreateRouteTable",
+    //     "ec2:DeleteRouteTable",
+    //     "ec2:DescribeRouteTables",
+    //     "ec2:CreateRoute",
+    //     "ec2:DeleteRoute",
+    //     "ec2:AssociateRouteTable",
+    //     "ec2:DisassociateRouteTable",
+    //     "ec2:CreateSecurityGroup",
+    //     "ec2:DeleteSecurityGroup",
+    //     "ec2:DescribeSecurityGroups",
+    //     "ec2:AuthorizeSecurityGroupIngress",
+    //     "ec2:AuthorizeSecurityGroupEgress",
+    //     "ec2:RevokeSecurityGroupIngress",
+    //     "ec2:RevokeSecurityGroupEgress",
+    //     "ec2:CreateTags",
+    //     "ec2:DeleteTags",
+    //     "ec2:DescribeTags",
+    //     "ec2:DescribeAvailabilityZones"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "EKSClusterManagement",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "eks:CreateCluster",
+    //     "eks:DeleteCluster",
+    //     "eks:DescribeCluster",
+    //     "eks:ListClusters",
+    //     "eks:UpdateClusterConfig",
+    //     "eks:UpdateClusterVersion",
+    //     "eks:CreateNodegroup",
+    //     "eks:DeleteNodegroup",
+    //     "eks:DescribeNodegroup",
+    //     "eks:ListNodegroups",
+    //     "eks:UpdateNodegroupConfig",
+    //     "eks:UpdateNodegroupVersion",
+    //     "eks:TagResource",
+    //     "eks:UntagResource",
+    //     "eks:ListTagsForResource"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "IAMManagement",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "iam:CreateRole",
+    //     "iam:DeleteRole",
+    //     "iam:GetRole",
+    //     "iam:ListRoles",
+    //     "iam:UpdateRole",
+    //     "iam:CreatePolicy",
+    //     "iam:DeletePolicy",
+    //     "iam:GetPolicy",
+    //     "iam:ListPolicies",
+    //     "iam:AttachRolePolicy",
+    //     "iam:DetachRolePolicy",
+    //     "iam:ListAttachedRolePolicies",
+    //     "iam:PutRolePolicy",
+    //     "iam:DeleteRolePolicy",
+    //     "iam:GetRolePolicy",
+    //     "iam:ListRolePolicies",
+    //     "iam:CreateOpenIDConnectProvider",
+    //     "iam:DeleteOpenIDConnectProvider",
+    //     "iam:GetOpenIDConnectProvider",
+    //     "iam:ListOpenIDConnectProviders",
+    //     "iam:TagRole",
+    //     "iam:UntagRole",
+    //     "iam:TagPolicy",
+    //     "iam:UntagPolicy",
+    //     "iam:PassRole"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "SQSManagement",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "sqs:CreateQueue",
+    //     "sqs:DeleteQueue",
+    //     "sqs:GetQueueAttributes",
+    //     "sqs:SetQueueAttributes",
+    //     "sqs:ListQueues",
+    //     "sqs:TagQueue",
+    //     "sqs:UntagQueue"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "S3Management",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "s3:CreateBucket",
+    //     "s3:DeleteBucket",
+    //     "s3:ListBucket",
+    //     "s3:GetBucketLocation",
+    //     "s3:GetBucketVersioning",
+    //     "s3:PutBucketVersioning",
+    //     "s3:GetBucketEncryption",
+    //     "s3:PutBucketEncryption",
+    //     "s3:GetBucketPublicAccessBlock",
+    //     "s3:PutBucketPublicAccessBlock",
+    //     "s3:GetLifecycleConfiguration",
+    //     "s3:PutLifecycleConfiguration",
+    //     "s3:GetBucketTagging",
+    //     "s3:PutBucketTagging"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "DynamoDBManagement",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "dynamodb:CreateTable",
+    //     "dynamodb:DeleteTable",
+    //     "dynamodb:DescribeTable",
+    //     "dynamodb:ListTables",
+    //     "dynamodb:UpdateTable",
+    //     "dynamodb:TagResource",
+    //     "dynamodb:UntagResource",
+    //     "dynamodb:ListTagsOfResource",
+    //     "dynamodb:DescribeTimeToLive",
+    //     "dynamodb:UpdateTimeToLive",
+    //     "dynamodb:DescribeContinuousBackups",
+    //     "dynamodb:UpdateContinuousBackups"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "ECRManagement",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "ecr:CreateRepository",
+    //     "ecr:DeleteRepository",
+    //     "ecr:DescribeRepositories",
+    //     "ecr:ListTagsForResource",
+    //     "ecr:TagResource",
+    //     "ecr:UntagResource"
+    //   ],
+    //   "Resource": "*"
+    // },
+    // {
+    //   "Sid": "CloudWatchLogs",
+    //   "Effect": "Allow",
+    //   "Action": [
+    //     "logs:CreateLogGroup",
+    //     "logs:DeleteLogGroup",
+    //     "logs:DescribeLogGroups",
+    //     "logs:PutRetentionPolicy",
+    //     "logs:TagLogGroup",
+    //     "logs:UntagLogGroup"
+    //   ],
+    //   "Resource": "*"
+    // }
+  ]
+}

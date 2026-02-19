@@ -16,10 +16,15 @@ terraform {
     }
   }
   
+  # Backend stores state in S3 with workspace-specific paths
+  # Workspaces: dev, production
+  # State files:
+  #   - s3://cmg-terraform-state/env:/dev/log-processor/terraform.tfstate
+  #   - s3://cmg-terraform-state/env:/production/log-processor/terraform.tfstate
   backend "s3" {
     bucket         = "cmg-terraform-state"
     key            = "log-processor/terraform.tfstate"
-    region         = "us-east-1"
+    region         = "eu-central-1"
     encrypt        = true
     dynamodb_table = "terraform-lock"
   }
@@ -51,11 +56,12 @@ provider "aws" {
 }
 
 locals {
+  # Environment-specific naming: cmg-log-processor-dev or cmg-log-processor-production
   name_prefix = "cmg-log-processor-${var.environment}"
   
   common_tags = {
     Project     = "CMG-Log-Processor"
-    Environment = var.environment
+    Environment = var.environment  # dev or production
     ManagedBy   = "Terraform"
   }
 }
@@ -101,7 +107,8 @@ module "s3" {
   environment         = var.environment
 }
 
-# DynamoDB for processed metrics
+# DynamoDB for processed metrics (application data)
+# Note: Different from bootstrap DynamoDB table which is for Terraform state locking
 module "dynamodb" {
   source = "./modules/dynamodb"
   
@@ -125,52 +132,34 @@ module "irsa" {
 }
 
 # Secondary Region (for HA)
-module "secondary_region" {
-  count  = var.enable_multi_region ? 1 : 0
-  source = "./modules/secondary-region"
-  
-  providers = {
-    aws = aws.secondary
-  }
-  
-  name_prefix        = local.name_prefix
-  vpc_cidr           = var.secondary_vpc_cidr
-  availability_zones = var.secondary_availability_zones
-  environment        = var.environment
-}
+# Uncomment to enable multi-region deployment
+# Note: Requires additional EKS cluster in secondary region
+
+# module "secondary_region" {
+#   count  = var.enable_multi_region ? 1 : 0
+#   source = "./modules/secondary-region"
+#   
+#   providers = {
+#     aws = aws.secondary
+#   }
+#   
+#   name_prefix        = local.name_prefix
+#   vpc_cidr           = var.secondary_vpc_cidr
+#   availability_zones = var.secondary_availability_zones
+#   environment        = var.environment
+# }
+
 
 # Route53 Health Checks and Failover
-module "route53" {
-  count  = var.enable_multi_region ? 1 : 0
-  source = "./modules/route53"
-  
-  domain_name       = var.domain_name
-  primary_endpoint  = module.eks.cluster_endpoint
-  secondary_endpoint = var.enable_multi_region ? module.secondary_region[0].cluster_endpoint : ""
-  environment       = var.environment
-}
+# Uncomment to enable DNS-based failover
+# Note: Requires Route53 hosted zone for domain_name
 
-# Outputs
-output "eks_cluster_name" {
-  value = module.eks.cluster_name
-}
-
-output "eks_cluster_endpoint" {
-  value = module.eks.cluster_endpoint
-}
-
-output "sqs_queue_url" {
-  value = module.sqs.queue_url
-}
-
-output "s3_bucket_name" {
-  value = module.s3.bucket_name
-}
-
-output "dynamodb_table_name" {
-  value = module.dynamodb.table_name
-}
-
-output "service_account_role_arn" {
-  value = module.irsa.role_arn
-}
+# module "route53" {
+#   count  = var.enable_multi_region ? 1 : 0
+#   source = "./modules/route53"
+#   
+#   domain_name       = var.domain_name
+#   primary_endpoint  = module.eks.cluster_endpoint
+#   secondary_endpoint = var.enable_multi_region ? module.secondary_region[0].cluster_endpoint : ""
+#   environment       = var.environment
+# }

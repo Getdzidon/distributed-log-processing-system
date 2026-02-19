@@ -1,3 +1,8 @@
+# VPC Module
+# Creates VPC with public/private subnets across multiple AZs for high availability
+# Includes NAT gateways for private subnet internet access
+
+# Main VPC with DNS support enabled for EKS
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -8,6 +13,7 @@ resource "aws_vpc" "main" {
   }
 }
 
+# Private subnets for EKS worker nodes (one per AZ)
 resource "aws_subnet" "private" {
   count             = length(var.availability_zones)
   vpc_id            = aws_vpc.main.id
@@ -16,10 +22,11 @@ resource "aws_subnet" "private" {
   
   tags = {
     Name                              = "${var.name_prefix}-private-${count.index + 1}"
-    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/role/internal-elb" = "1"  # Tag for internal load balancers
   }
 }
 
+# Public subnets for NAT gateways and public load balancers
 resource "aws_subnet" "public" {
   count                   = length(var.availability_zones)
   vpc_id                  = aws_vpc.main.id
@@ -29,10 +36,11 @@ resource "aws_subnet" "public" {
   
   tags = {
     Name                     = "${var.name_prefix}-public-${count.index + 1}"
-    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/role/elb" = "1"  # Tag for public load balancers
   }
 }
 
+# Internet gateway for public subnet internet access
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
   
@@ -41,6 +49,7 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
+# Elastic IPs for NAT gateways (one per AZ for HA)
 resource "aws_eip" "nat" {
   count  = length(var.availability_zones)
   domain = "vpc"
@@ -50,6 +59,7 @@ resource "aws_eip" "nat" {
   }
 }
 
+# NAT gateways for private subnet internet access (one per AZ)
 resource "aws_nat_gateway" "main" {
   count         = length(var.availability_zones)
   allocation_id = aws_eip.nat[count.index].id
@@ -60,6 +70,7 @@ resource "aws_nat_gateway" "main" {
   }
 }
 
+# Route tables for private subnets (one per AZ, routes through NAT)
 resource "aws_route_table" "private" {
   count  = length(var.availability_zones)
   vpc_id = aws_vpc.main.id
@@ -74,6 +85,7 @@ resource "aws_route_table" "private" {
   }
 }
 
+# Route table for public subnets (routes through internet gateway)
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   
@@ -87,26 +99,16 @@ resource "aws_route_table" "public" {
   }
 }
 
+# Associate private subnets with their route tables
 resource "aws_route_table_association" "private" {
   count          = length(var.availability_zones)
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
 }
 
+# Associate public subnets with public route table
 resource "aws_route_table_association" "public" {
   count          = length(var.availability_zones)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
-}
-
-output "vpc_id" {
-  value = aws_vpc.main.id
-}
-
-output "private_subnet_ids" {
-  value = aws_subnet.private[*].id
-}
-
-output "public_subnet_ids" {
-  value = aws_subnet.public[*].id
 }

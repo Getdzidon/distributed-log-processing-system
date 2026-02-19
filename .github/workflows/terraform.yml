@@ -44,10 +44,10 @@ jobs:
     name: Terraform Plan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
@@ -88,6 +88,9 @@ jobs:
     name: Apply to Dev
     needs: terraform-plan
     runs-on: ubuntu-latest
+    # Triggers:
+    # 1. Automatic: Push to main branch (deploys to dev workspace)
+    # 2. Manual: workflow_dispatch with environment=dev and action=apply
     if: |
       (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev' && github.event.inputs.action == 'apply')
@@ -111,6 +114,8 @@ jobs:
         working-directory: infrastructure/terraform
         run: terraform init
       
+      # Selects 'dev' workspace and applies dev.tfvars
+      # Resources created: cmg-log-processor-dev-*
       - name: Terraform Apply - Dev
         working-directory: infrastructure/terraform
         run: |
@@ -131,11 +136,14 @@ jobs:
     name: Apply to Production
     needs: terraform-plan
     runs-on: ubuntu-latest
+    # Trigger: Manual workflow_dispatch ONLY
+    # Requires: environment=production and action=apply
+    # GitHub environment protection rules enforce manual approval
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production' && github.event.inputs.action == 'apply'
     environment:
       name: production-infrastructure
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -152,6 +160,8 @@ jobs:
         working-directory: infrastructure/terraform
         run: terraform init
       
+      # Selects 'production' workspace and applies production.tfvars
+      # Resources created: cmg-log-processor-production-*
       - name: Terraform Apply - Production
         working-directory: infrastructure/terraform
         run: |

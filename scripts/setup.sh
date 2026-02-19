@@ -1,5 +1,23 @@
 #!/bin/bash
 # Complete setup script for CMG Log Processor
+#
+# This script automates the complete deployment process:
+#   1. Deploy infrastructure with Terraform
+#   2. Configure kubectl for EKS access
+#   3. Install KEDA for autoscaling
+#   4. Install observability stack (Grafana, Prometheus, Loki)
+#   5. Build and push Docker image to ECR
+#   6. Deploy application with Helm
+#   7. Verify deployment and send test message
+#
+# Use cases:
+#   - Quick manual deployments from your local machine
+#   - Testing infrastructure changes before committing
+#   - Disaster recovery scenarios
+#   - Environments without CI/CD access
+#
+# Note: For production, GitHub Actions workflows are recommended.
+#       See docs/CICD.md for automated CI/CD setup.
 
 set -e
 
@@ -20,8 +38,8 @@ echo "✓ All prerequisites found"
 echo ""
 
 # Configuration
-ENVIRONMENT=${ENVIRONMENT:-"staging"}
-AWS_REGION=${AWS_REGION:-"us-east-1"}
+ENVIRONMENT=${ENVIRONMENT:-"dev"}
+AWS_REGION=${AWS_REGION:-"eu-central-1"}
 
 echo "Configuration:"
 echo "  Environment: $ENVIRONMENT"

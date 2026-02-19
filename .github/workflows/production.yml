@@ -1,14 +1,14 @@
 # Production deployment workflow with multi-region support
-# Triggers on push to main branch and requires manual approval before deploying
+# Requires manual trigger via workflow_dispatch
 name: Deploy to Production
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
-  id-token: write   # Required for OIDC authentication
+  id-token: write       # Required for OIDC authentication
   contents: read
+  security-events: write  # Required for reusable workflow security scan
 
 jobs:
   # Call reusable workflow for test, scan, and build

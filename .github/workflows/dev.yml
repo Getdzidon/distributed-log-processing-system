@@ -1,14 +1,20 @@
 # Dev environment deployment workflow
-# Triggers on push to dev branch and automatically deploys to dev EKS cluster
+# Triggers on push to main branch and automatically deploys to dev EKS cluster
 name: Deploy to Dev
 
 on:
   push:
-    branches: [dev]
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'infrastructure/helm/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
 
 permissions:
-  id-token: write   # Required for OIDC authentication
+  id-token: write       # Required for OIDC authentication
   contents: read
+  security-events: write  # Required for reusable workflow security scan
 
 jobs:
   # Call reusable workflow for test, scan, and build

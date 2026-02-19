@@ -1,10 +1,10 @@
 # Dev environment deployment workflow
-# Triggers on push to main branch and automatically deploys to dev EKS cluster
+# Triggers on push to dev branch and automatically deploys to dev EKS cluster
 name: Deploy to Dev
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
     paths:
       - 'src/**'
       - 'infrastructure/helm/**'

@@ -6,7 +6,7 @@ name: Deploy Terraform Infrastructure
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
     paths:
       - 'infrastructure/terraform/**'
   pull_request:
@@ -89,10 +89,10 @@ jobs:
     needs: terraform-plan
     runs-on: ubuntu-latest
     # Triggers:
-    # 1. Automatic: Push to main branch (deploys to dev workspace)
+    # 1. Automatic: Push to dev branch (deploys to dev workspace)
     # 2. Manual: workflow_dispatch with environment=dev and action=apply
     if: |
-      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      (github.ref == 'refs/heads/dev' && github.event_name == 'push') ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev' && github.event.inputs.action == 'apply')
     environment:
       name: dev-infrastructure

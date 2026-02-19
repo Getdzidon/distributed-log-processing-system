@@ -1,9 +1,16 @@
 # Production deployment workflow with multi-region support
-# Requires manual trigger via workflow_dispatch
+# Triggers on push to main branch for application deployment
 name: Deploy to Production
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'infrastructure/helm/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
+  workflow_dispatch:  # Allow manual trigger
 
 permissions:
   id-token: write       # Required for OIDC authentication

@@ -57,8 +57,9 @@
 - [x] infrastructure/terraform/modules/secondary-region/main.tf
 - [x] infrastructure/terraform/modules/secondary-region/variables.tf
 - [x] infrastructure/terraform/modules/secondary-region/README.md
-- [x] infrastructure/terraform/modules/route53/main.tf
+- [x] infrastructure/terraform/modules/route53/route53.tf
 - [x] infrastructure/terraform/modules/route53/variables.tf
+- [x] infrastructure/terraform/modules/route53/outputs.tf
 - [x] infrastructure/terraform/modules/route53/README.md
 
 ### ☸️ Kubernetes/Helm (6 files)

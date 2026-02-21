@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: dev
-      url: https://dev.cmg-logs.example.com
+      url: https://dev.log-processor.cmg.io
     steps:
       - uses: actions/checkout@v6
       
@@ -44,8 +44,14 @@ jobs:
       # Deploy to dev EKS cluster using Helm
       - name: Deploy
         run: |
-          aws eks update-kubeconfig --name cmg-log-processor-dev --region eu-central-1
+          aws eks update-kubeconfig --name cmg-log-processor-dev-cluster --region eu-central-1
           helm upgrade --install log-processor infrastructure/helm/log-processor \
             --namespace log-processing --create-namespace \
             --values infrastructure/helm/log-processor/values-dev.yaml \
-            --set image.tag=${{ needs.build.outputs.image-tag }} --wait
+            --set image.repository=${{ secrets.ECR_REPOSITORY }} \
+            --set image.tag=${{ needs.build.outputs.image-tag }} \
+            --set env[4].value=${{ secrets.DEV_QUEUE_URL }} \
+            --set env[5].value=${{ secrets.DEV_S3_BUCKET }} \
+            --set env[6].value=${{ secrets.DEV_DYNAMODB_TABLE }} \
+            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=${{ secrets.DEV_SERVICE_ACCOUNT_ROLE_ARN }} \
+            --wait

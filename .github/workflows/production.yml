@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production  # Requires manual approval (configured in GitHub)
-      url: https://logs.cmg.example.com
+      url: https://log-processor.cmg.io
     steps:
       - uses: actions/checkout@v6
       
@@ -45,17 +45,29 @@ jobs:
       # Deploy to primary region (eu-central-1)
       - name: Deploy eu-central-1
         run: |
-          aws eks update-kubeconfig --name cmg-log-processor-prod-eu-central-1 --region eu-central-1
+          aws eks update-kubeconfig --name cmg-log-processor-production-cluster --region eu-central-1
           helm upgrade --install log-processor infrastructure/helm/log-processor \
             --namespace log-processing --create-namespace \
             --values infrastructure/helm/log-processor/values-production.yaml \
-            --set image.tag=${{ needs.build.outputs.image-tag }} --wait
+            --set image.repository=${{ secrets.ECR_REPOSITORY }} \
+            --set image.tag=${{ needs.build.outputs.image-tag }} \
+            --set env[4].value=${{ secrets.PROD_QUEUE_URL }} \
+            --set env[5].value=${{ secrets.PROD_S3_BUCKET }} \
+            --set env[6].value=${{ secrets.PROD_DYNAMODB_TABLE }} \
+            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=${{ secrets.PROD_SERVICE_ACCOUNT_ROLE_ARN }} \
+            --wait
             
       # Deploy to secondary region (eu-west-1) for high availability
       - name: Deploy eu-west-1
         run: |
-          aws eks update-kubeconfig --name cmg-log-processor-prod-eu-west-1 --region eu-west-1
+          aws eks update-kubeconfig --name cmg-log-processor-production-secondary --region eu-west-1
           helm upgrade --install log-processor infrastructure/helm/log-processor \
             --namespace log-processing --create-namespace \
             --values infrastructure/helm/log-processor/values-production.yaml \
-            --set image.tag=${{ needs.build.outputs.image-tag }} --wait
+            --set image.repository=${{ secrets.ECR_REPOSITORY }} \
+            --set image.tag=${{ needs.build.outputs.image-tag }} \
+            --set env[4].value=${{ secrets.PROD_QUEUE_URL }} \
+            --set env[5].value=${{ secrets.PROD_S3_BUCKET }} \
+            --set env[6].value=${{ secrets.PROD_DYNAMODB_TABLE }} \
+            --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=${{ secrets.PROD_SERVICE_ACCOUNT_ROLE_ARN }} \
+            --wait

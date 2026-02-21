@@ -1,14 +1,14 @@
 replicaCount: 1
 
 image:
-  repository: 123456789012.dkr.ecr.eu-central-1.amazonaws.com/log-processor
+  repository: ""  # Set by workflow from ECR repository URL
   pullPolicy: Always
   tag: "dev"
 
 serviceAccount:
   create: true
   annotations:
-    eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/cmg-log-processor-dev-log-processor"
+    eks.amazonaws.com/role-arn: ""  # Set by workflow from Terraform output
   name: log-processor
 
 resources:
@@ -39,10 +39,10 @@ env:
     value: "opentelemetry-collector.observability.svc.cluster.local:4317"
 
   - name: QUEUE_URL
-    value: "https://sqs.eu-central-1.amazonaws.com/123456789012/cmg-log-processor-dev-queue"
+    value: ""  # Set by workflow from Terraform output
 
   - name: RAW_LOGS_BUCKET
-    value: "cmg-log-processor-dev-raw-logs"
+    value: ""  # Set by workflow from Terraform output
     
   - name: PROCESSED_METRICS_TABLE
-    value: "cmg-log-processor-dev-metrics"
+    value: ""  # Set by workflow from Terraform output

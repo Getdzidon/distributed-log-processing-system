@@ -132,6 +132,56 @@ jobs:
           name: dev-outputs
           path: infrastructure/terraform/outputs.json
   
+  # Deploy observability stack after infrastructure is ready
+  deploy-observability-dev:
+    name: Deploy Observability Stack (Dev)
+    needs: terraform-apply-dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --name cmg-log-processor-dev-cluster --region eu-central-1
+          kubectl get nodes
+      
+      - name: Install KEDA
+        run: |
+          helm repo add kedacore https://kedacore.github.io/charts
+          helm repo update
+          helm upgrade --install keda kedacore/keda \
+            --namespace keda --create-namespace \
+            --set podIdentity.aws.irsa.enabled=true \
+            --wait
+      
+      - name: Install Observability Stack
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+          helm upgrade --install loki grafana/loki-stack \
+            --namespace observability --create-namespace \
+            --set grafana.enabled=true \
+            --set prometheus.enabled=true \
+            --set prometheus.server.persistentVolume.enabled=true \
+            --set loki.persistence.enabled=true \
+            --set grafana.persistence.enabled=true \
+            --wait
+      
+      - name: Install OpenTelemetry Collector
+        run: |
+          helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+          helm repo update
+          helm upgrade --install opentelemetry-collector open-telemetry/opentelemetry-collector \
+            --namespace observability \
+            --set mode=deployment \
+            --wait
+  
   terraform-apply-production:
     name: Apply to Production
     needs: terraform-plan
@@ -177,3 +227,57 @@ jobs:
         with:
           name: production-outputs
           path: infrastructure/terraform/outputs.json
+  
+  # Deploy observability stack after infrastructure is ready
+  deploy-observability-production:
+    name: Deploy Observability Stack (Production)
+    needs: terraform-apply-production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig --name cmg-log-processor-production-cluster --region eu-central-1
+          kubectl get nodes
+      
+      - name: Install KEDA
+        run: |
+          helm repo add kedacore https://kedacore.github.io/charts
+          helm repo update
+          helm upgrade --install keda kedacore/keda \
+            --namespace keda --create-namespace \
+            --set podIdentity.aws.irsa.enabled=true \
+            --wait
+      
+      - name: Install Observability Stack
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+          helm upgrade --install loki grafana/loki-stack \
+            --namespace observability --create-namespace \
+            --set grafana.enabled=true \
+            --set prometheus.enabled=true \
+            --set prometheus.server.persistentVolume.enabled=true \
+            --set prometheus.server.persistentVolume.size=50Gi \
+            --set loki.persistence.enabled=true \
+            --set loki.persistence.size=20Gi \
+            --set grafana.persistence.enabled=true \
+            --set grafana.replicas=2 \
+            --wait
+      
+      - name: Install OpenTelemetry Collector
+        run: |
+          helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+          helm repo update
+          helm upgrade --install opentelemetry-collector open-telemetry/opentelemetry-collector \
+            --namespace observability \
+            --set mode=deployment \
+            --set replicaCount=2 \
+            --wait

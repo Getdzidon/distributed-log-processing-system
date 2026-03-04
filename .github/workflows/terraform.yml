@@ -79,7 +79,7 @@ jobs:
       
       - name: Upload Dev Plan
         if: github.event_name == 'pull_request' || github.event.inputs.environment == 'dev'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: dev-tfplan
           path: infrastructure/terraform/dev.tfplan
@@ -127,7 +127,7 @@ jobs:
         run: terraform output -json > outputs.json
       
       - name: Upload Outputs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: dev-outputs
           path: infrastructure/terraform/outputs.json
@@ -173,7 +173,7 @@ jobs:
         run: terraform output -json > outputs.json
       
       - name: Upload Outputs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: production-outputs
           path: infrastructure/terraform/outputs.json

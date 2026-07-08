@@ -1,9 +1,9 @@
-# Makefile for CMG Log Processor
+# Makefile for Distributed Log Processing System
 
 .PHONY: help install test lint build deploy clean
 
 help:
-	@echo "CMG Log Processor - Available Commands"
+	@echo "Distributed Log Processor - Available Commands"
 	@echo "======================================="
 	@echo "install    - Install dependencies"
 	@echo "test       - Run tests with coverage"

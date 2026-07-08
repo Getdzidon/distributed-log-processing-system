@@ -58,5 +58,5 @@ variable "enable_multi_region" {
 variable "domain_name" {
   description = "Domain name for Route53"
   type        = string
-  default     = "log-processor.cmg.io"
+  default     = "log-processor.example.io"
 }

@@ -35,8 +35,8 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::cmg-terraform-state",
-        "arn:aws:s3:::cmg-terraform-state/*"
+        "arn:aws:s3:::dlps-terraform-state",
+        "arn:aws:s3:::dlps-terraform-state/*"
       ]
     },
     {

@@ -30,11 +30,11 @@ aws configure
 
 ```bash
 # Create S3 bucket for Terraform state
-aws s3 mb s3://cmg-terraform-state --region eu-central-1
+aws s3 mb s3://dlps-terraform-state --region eu-central-1
 
 # Enable versioning
 aws s3api put-bucket-versioning \
-  --bucket cmg-terraform-state \
+  --bucket dlps-terraform-state \
   --versioning-configuration Status=Enabled
 
 # Create DynamoDB table for state locking
@@ -251,13 +251,13 @@ kubectl port-forward -n observability svc/loki-grafana 3000:80
 
 ```bash
 # Primary region (eu-central-1)
-aws eks update-kubeconfig --name cmg-log-processor-prod-eu-central-1 --region eu-central-1
+aws eks update-kubeconfig --name dlps-log-processor-prod-eu-central-1 --region eu-central-1
 helm upgrade --install log-processor infrastructure/helm/log-processor \
   --namespace log-processing --create-namespace \
   --values infrastructure/helm/log-processor/values-production.yaml --wait
 
 # Secondary region (eu-west-1)
-aws eks update-kubeconfig --name cmg-log-processor-prod-eu-west-1 --region eu-west-1
+aws eks update-kubeconfig --name dlps-log-processor-prod-eu-west-1 --region eu-west-1
 helm upgrade --install log-processor infrastructure/helm/log-processor \
   --namespace log-processing --create-namespace \
   --values infrastructure/helm/log-processor/values-production.yaml --wait

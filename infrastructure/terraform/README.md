@@ -23,8 +23,8 @@ This Terraform configuration manages **two separate environments**:
 - `production.tfvars` - Larger resources, multi-region HA
 
 **3. Resource Naming**
-- Dev: `cmg-log-processor-dev-*`
-- Production: `cmg-log-processor-production-*`
+- Dev: `dlps-log-processor-dev-*`
+- Production: `dlps-log-processor-production-*`
 
 ## Deployment
 
@@ -77,8 +77,8 @@ terraform workspace list
 ## State Management
 
 State files are stored in S3 with workspace prefixes:
-- Dev: `s3://cmg-terraform-state/env:/dev/log-processor/terraform.tfstate`
-- Production: `s3://cmg-terraform-state/env:/production/log-processor/terraform.tfstate`
+- Dev: `s3://dlps-terraform-state/env:/dev/log-processor/terraform.tfstate`
+- Production: `s3://dlps-terraform-state/env:/production/log-processor/terraform.tfstate`
 
 State locking uses DynamoDB table: `terraform-lock`
 
@@ -95,8 +95,8 @@ State locking uses DynamoDB table: `terraform-lock`
 ## GitHub Actions OIDC
 
 The `github_oidc` module creates **environment-specific** IAM roles:
-- Dev: `cmg-log-processor-github-actions-dev`
-- Production: `cmg-log-processor-github-actions-production`
+- Dev: `dlps-log-processor-github-actions-dev`
+- Production: `dlps-log-processor-github-actions-production`
 
 Update `github_org` and `github_repo` in `main.tf` before deploying.
 

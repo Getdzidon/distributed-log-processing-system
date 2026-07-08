@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "state_bucket_name" {
   description = "S3 bucket name for Terraform state"
   type        = string
-  default     = "cmg-terraform-state"
+  default     = "dlps-terraform-state"
 }
 
 variable "lock_table_name" {
@@ -19,7 +19,7 @@ variable "lock_table_name" {
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "cmg-log-processor"
+  default     = "dlps-log-processor"
 }
 
 variable "github_org" {
@@ -30,7 +30,7 @@ variable "github_org" {
 variable "github_repo" {
   description = "GitHub repository name"
   type        = string
-  default     = "cmg-sre-test"
+  default     = "distributed-log-processing-system"
 }
 
 variable "attach_admin_policy" {

@@ -8,7 +8,7 @@ Configure these secrets in GitHub: **Settings → Secrets and variables → Acti
 
 | Secret Name | Description | Example Value | Used By |
 |------------|-------------|---------------|---------|
-| `AWS_ROLE_ARN` | IAM role ARN for GitHub Actions OIDC | `arn:aws:iam::123456789012:role/cmg-log-processor-github-actions-production` | All workflows |
+| `AWS_ROLE_ARN` | IAM role ARN for GitHub Actions OIDC | `arn:aws:iam::123456789012:role/dlps-log-processor-github-actions-production` | All workflows |
 
 ## How to Get AWS_ROLE_ARN
 
@@ -34,7 +34,7 @@ See [../bootstrap/README.md](../bootstrap/README.md) for detailed instructions.
 3. Click **New repository secret**
 4. Add each secret:
    - **Name**: `AWS_ROLE_ARN`
-   - **Value**: `arn:aws:iam::123456789012:role/cmg-log-processor-github-actions-production`
+   - **Value**: `arn:aws:iam::123456789012:role/dlps-log-processor-github-actions-production`
 5. Click **Add secret**
 
 ## Secrets Usage by Workflow
@@ -96,7 +96,7 @@ gh run list --workflow=terraform.yml
 
 Look for successful AWS authentication in logs:
 ```
-Assuming role: arn:aws:iam::123456789012:role/cmg-log-processor-github-actions-production
+Assuming role: arn:aws:iam::123456789012:role/dlps-log-processor-github-actions-production
 Successfully assumed role
 ```
 

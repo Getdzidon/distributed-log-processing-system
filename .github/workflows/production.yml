@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production  # Requires manual approval (configured in GitHub)
-      url: https://logs.cmg.example.com
+      url: https://logs.example.com
     steps:
       - uses: actions/checkout@v6
       
@@ -38,7 +38,7 @@ jobs:
       # Deploy to primary region (eu-central-1)
       - name: Deploy eu-central-1
         run: |
-          aws eks update-kubeconfig --name cmg-log-processor-prod-eu-central-1 --region eu-central-1
+          aws eks update-kubeconfig --name dlps-log-processor-prod-eu-central-1 --region eu-central-1
           helm upgrade --install log-processor infrastructure/helm/log-processor \
             --namespace log-processing --create-namespace \
             --values infrastructure/helm/log-processor/values-production.yaml \
@@ -47,7 +47,7 @@ jobs:
       # Deploy to secondary region (eu-west-1) for high availability
       - name: Deploy eu-west-1
         run: |
-          aws eks update-kubeconfig --name cmg-log-processor-prod-eu-west-1 --region eu-west-1
+          aws eks update-kubeconfig --name dlps-log-processor-prod-eu-west-1 --region eu-west-1
           helm upgrade --install log-processor infrastructure/helm/log-processor \
             --namespace log-processing --create-namespace \
             --values infrastructure/helm/log-processor/values-production.yaml \

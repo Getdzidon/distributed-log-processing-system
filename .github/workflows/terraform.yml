@@ -115,7 +115,7 @@ jobs:
         run: terraform init
       
       # Selects 'dev' workspace and applies dev.tfvars
-      # Resources created: cmg-log-processor-dev-*
+      # Resources created: dlps-log-processor-dev-*
       - name: Terraform Apply - Dev
         working-directory: infrastructure/terraform
         run: |
@@ -161,7 +161,7 @@ jobs:
         run: terraform init
       
       # Selects 'production' workspace and applies production.tfvars
-      # Resources created: cmg-log-processor-production-*
+      # Resources created: dlps-log-processor-production-*
       - name: Terraform Apply - Production
         working-directory: infrastructure/terraform
         run: |

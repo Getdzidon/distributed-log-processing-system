@@ -1,6 +1,6 @@
 apiVersion: v2
 name: log-processor
-description: CMG Distributed Log Processing System
+description: Distributed Log Processing System
 type: application
 version: 1.0.0
 appVersion: "1.0.0"
@@ -9,4 +9,4 @@ keywords:
   - observability
   - sre
 maintainers:
-  - name: CMG SRE Team
+  - name: Donatus Dziedzorm Dzissah

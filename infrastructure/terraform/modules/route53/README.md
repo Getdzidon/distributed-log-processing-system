@@ -14,7 +14,7 @@ This module is currently commented out in `main.tf`. To enable:
 
 1. **Create Route53 hosted zone** for your domain:
    ```bash
-   aws route53 create-hosted-zone --name log-processor.cmg.io --caller-reference $(date +%s)
+   aws route53 create-hosted-zone --name log-processor.example.io --caller-reference $(date +%s)
    ```
 
 2. **Update domain nameservers** with your registrar

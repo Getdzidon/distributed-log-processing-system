@@ -1,4 +1,4 @@
-# CMG SRE Take-Home Assignment: Distributed Log Processing System
+# Distributed Log Processing System
 
 ## 🎯 Overview
 
@@ -91,10 +91,6 @@ See [docs/CICD.md](docs/CICD.md)
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design
 - [ADDING_SENSORS.md](docs/ADDING_SENSORS.md) - Extensibility
 - [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Problem resolution
-- [SUBMISSION.md](SUBMISSION.md) - Interview submission
 
 ## 👤 Author
 Dzissah, Donatus Dziedzorm
-
-**CMG SRE Take-Home Assignment**  
-Demonstrating: IaC, Observability, Scalability, SRE Best Practices

@@ -22,10 +22,10 @@ The repository includes a Terraform module for automated OIDC setup.
 module "github_oidc" {
   source = "./modules/github-oidc"
   
-  project_name  = "cmg-log-processor"
+  project_name  = "dlps-log-processor"
   environment   = "production"
   github_org    = "your-github-username"  # Your GitHub username (personal account)
-  github_repo   = "cmg-sre-test"          # Your repository name
+  github_repo   = "distributed-log-processing-system"  # Your repository name
   
   attach_admin_policy = true  # Use with caution, only for initial setup
 }
@@ -73,7 +73,7 @@ Create `github-actions-role.json`:
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:YOUR_ORG/cmg-sre-assignment:*"
+          "token.actions.githubusercontent.com:sub": "repo:YOUR_ORG/distributed-log-processing-system:*"
         }
       }
     }

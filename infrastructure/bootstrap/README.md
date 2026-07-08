@@ -23,7 +23,7 @@ Edit `terraform.tfvars`:
 
 ```hcl
 github_org  = "your-github-username"  # Replace with your GitHub username
-github_repo = "cmg-sre-test"          # Replace with your repository name
+github_repo = "distributed-log-processing-system"  # Replace with your repository name
 
 # Set to false for production (uncomment sections in deploy-policy.json first)
 attach_admin_policy = true
@@ -50,12 +50,12 @@ Bootstrap creates these resources:
 
 | Resource | Name | Purpose |
 |----------|------|---------|
-| S3 Bucket | `cmg-terraform-state` | Stores Terraform state files |
+| S3 Bucket | `dlps-terraform-state` | Stores Terraform state files |
 | DynamoDB Table | `terraform-lock` | Prevents concurrent Terraform runs |
 | OIDC Provider | GitHub Actions | Allows GitHub to authenticate to AWS |
-| IAM Role | `cmg-log-processor-github-actions` | Role assumed by GitHub Actions |
+| IAM Role | `dlps-log-processor-github-actions` | Role assumed by GitHub Actions |
 
-**Important**: The S3 bucket name (`cmg-terraform-state`) and DynamoDB table name (`terraform-lock`) are hardcoded in `infrastructure/terraform/main.tf` backend configuration. If you change these names in `terraform.tfvars`, you must also update the backend block in `infrastructure/terraform/main.tf`.
+**Important**: The S3 bucket name (`dlps-terraform-state`) and DynamoDB table name (`terraform-lock`) are hardcoded in `infrastructure/terraform/main.tf` backend configuration. If you change these names in `terraform.tfvars`, you must also update the backend block in `infrastructure/terraform/main.tf`.
 
 ### Step 3: Save Outputs
 
@@ -64,7 +64,7 @@ Bootstrap creates these resources:
 terraform output github_actions_role_arn
 
 # Example output:
-# arn:aws:iam::123456789012:role/cmg-log-processor-github-actions
+# arn:aws:iam::123456789012:role/dlps-log-processor-github-actions
 ```
 
 ### Step 4: Add Secret to GitHub

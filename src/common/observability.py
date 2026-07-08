@@ -20,7 +20,7 @@ import logging
 # Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
-    format='{"timestamp":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s","trace_id":"%(otelTraceID)s","span_id":"%(otelSpanID)s"}',
+    format='{"timestamp":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s"}',
     datefmt='%Y-%m-%dT%H:%M:%S'
 )
 

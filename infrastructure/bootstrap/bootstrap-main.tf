@@ -23,7 +23,7 @@ provider "aws" {
   
   default_tags {
     tags = {
-      Project     = "CMG-Log-Processor"
+      Project     = "Log-Processor"
       Environment = "bootstrap"
       ManagedBy   = "Terraform"
     }

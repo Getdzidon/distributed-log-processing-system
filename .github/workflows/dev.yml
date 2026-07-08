@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: dev
-      url: https://dev.cmg-logs.example.com
+      url: https://dev.logs.example.com
     steps:
       - uses: actions/checkout@v6
       
@@ -44,7 +44,7 @@ jobs:
       # Deploy to dev EKS cluster using Helm
       - name: Deploy
         run: |
-          aws eks update-kubeconfig --name cmg-log-processor-dev --region eu-central-1
+          aws eks update-kubeconfig --name dlps-log-processor-dev --region eu-central-1
           helm upgrade --install log-processor infrastructure/helm/log-processor \
             --namespace log-processing --create-namespace \
             --values infrastructure/helm/log-processor/values-dev.yaml \

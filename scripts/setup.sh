@@ -1,5 +1,5 @@
 #!/bin/bash
-# Complete setup script for CMG Log Processor
+# Complete setup script for Distributed Log Processor
 #
 # This script automates the complete deployment process:
 #   1. Deploy infrastructure with Terraform
@@ -22,7 +22,7 @@
 set -e
 
 echo "=========================================="
-echo "CMG Log Processor - Complete Setup"
+echo "Distributed Log Processor - Complete Setup"
 echo "=========================================="
 echo ""
 

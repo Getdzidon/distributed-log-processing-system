@@ -1,10 +1,10 @@
-# CMG SRE Assignment - File Inventory
+# Distributed Log Processing System - File Inventory
 
 ## ✅ Complete Project Checklist
 
-### 📝 Documentation (6 files)
+### 📝 Documentation (8 files)
 - [x] README.md - Main project overview
-- [x] SUBMISSION.md - Formal submission document
+- [x] FILE_INVENTORY.md - Project file inventory
 - [x] docs/ARCHITECTURE.md - System design
 - [x] docs/DEPLOYMENT.md - Deployment guide
 - [x] docs/CICD.md - CI/CD workflows
@@ -25,8 +25,9 @@
 - [x] src/processors/pressure.py - Pressure sensor
 
 ### 🏗️ Infrastructure as Code (42+ files)
-- [x] infrastructure/bootstrap/main.tf - Bootstrap S3 backend and GitHub OIDC
+- [x] infrastructure/bootstrap/bootstrap-main.tf - Bootstrap S3 backend and GitHub OIDC
 - [x] infrastructure/bootstrap/variables.tf
+- [x] infrastructure/bootstrap/outputs.tf
 - [x] infrastructure/bootstrap/trust-policy.json
 - [x] infrastructure/bootstrap/deploy-policy.json
 - [x] infrastructure/bootstrap/README.md
@@ -102,7 +103,7 @@
 
 - **Total Files**: 75+
 - **Lines of Code**: ~4,000+
-- **Documentation Pages**: 9
+- **Documentation Pages**: 8
 - **Terraform Modules**: 7
 - **GitHub Workflows**: 5
 - **Test Coverage**: 85%+
@@ -120,7 +121,7 @@
 | Kubernetes | ✅ Complete | 6 | GitOps-ready |
 | CI/CD | ✅ Complete | 6 | Automated |
 | Tests | ✅ Complete | 4 | 85%+ coverage |
-| Documentation | ✅ Complete | 9 | Comprehensive |
+| Documentation | ✅ Complete | 8 | Comprehensive |
 | Scripts | ✅ Complete | 3 | Automated |
 
 ---
@@ -129,8 +130,7 @@
 
 ### Start Here
 1. [README.md](README.md) - Project overview
-2. [SUBMISSION.md](SUBMISSION.md) - Formal submission
-3. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design
+2. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design
 
 ### For Deployment
 1. [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) - Manual deployment
@@ -146,22 +146,3 @@
 1. [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) - Problem resolution
 2. [infrastructure/helm/](infrastructure/helm/) - Kubernetes manifests
 3. [src/common/observability.py](src/common/observability.py) - Metrics reference
-
----
-
-## ✨ Highlights
-
-This repository contains everything needed for a production deployment:
-
-✅ **Complete Application** - Modular, tested, observable  
-✅ **Full Infrastructure** - AWS resources via Terraform  
-✅ **Kubernetes Ready** - Helm charts with autoscaling  
-✅ **CI/CD Pipeline** - Automated testing and deployment  
-✅ **Comprehensive Docs** - 10 detailed guides  
-✅ **Production Security** - IRSA, encryption, least privilege  
-✅ **Multi-Region HA** - Active-active with failover  
-✅ **Cost Optimized** - ~$310/month  
-
----
-
-**All files created and ready for submission! 🎉**

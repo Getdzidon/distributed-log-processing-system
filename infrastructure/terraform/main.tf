@@ -19,10 +19,10 @@ terraform {
   # Backend stores state in S3 with workspace-specific paths
   # Workspaces: dev, production
   # State files:
-  #   - s3://cmg-terraform-state/env:/dev/log-processor/terraform.tfstate
-  #   - s3://cmg-terraform-state/env:/production/log-processor/terraform.tfstate
+  #   - s3://dlps-terraform-state/env:/dev/log-processor/terraform.tfstate
+  #   - s3://dlps-terraform-state/env:/production/log-processor/terraform.tfstate
   backend "s3" {
-    bucket         = "cmg-terraform-state"
+    bucket         = "dlps-terraform-state"
     key            = "log-processor/terraform.tfstate"
     region         = "eu-central-1"
     encrypt        = true
@@ -35,7 +35,7 @@ provider "aws" {
   
   default_tags {
     tags = {
-      Project     = "CMG-Log-Processor"
+      Project     = "Log-Processor"
       Environment = var.environment
       ManagedBy   = "Terraform"
     }
@@ -48,7 +48,7 @@ provider "aws" {
   
   default_tags {
     tags = {
-      Project     = "CMG-Log-Processor"
+      Project     = "Log-Processor"
       Environment = var.environment
       ManagedBy   = "Terraform"
     }
@@ -56,11 +56,11 @@ provider "aws" {
 }
 
 locals {
-  # Environment-specific naming: cmg-log-processor-dev or cmg-log-processor-production
-  name_prefix = "cmg-log-processor-${var.environment}"
+  # Environment-specific naming: dlps-log-processor-dev or dlps-log-processor-production
+  name_prefix = "dlps-log-processor-${var.environment}"
   
   common_tags = {
-    Project     = "CMG-Log-Processor"
+    Project     = "Log-Processor"
     Environment = var.environment  # dev or production
     ManagedBy   = "Terraform"
   }
